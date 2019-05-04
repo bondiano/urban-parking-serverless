@@ -1,0 +1,78 @@
+service: urban-parking
+
+custom:
+  myStage: ${opt:stage, self:provider.stage}
+  myEnvironment:
+    TABLE:
+      prod: "urban-parking-prod"
+      dev: "urban-parking-dev"
+    BUCKET:
+      prod: "urban-parking-bucket-prod"
+      dev: "urban-parking-bucket-dev"
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  environment:
+    TABLE: ${self:custom.myEnvironment.TABLE.${self:custom.myStage}}
+    BUCKET: ${self:custom.myEnvironment.BUCKET.${self:custom.myStage}}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "*"
+    - Effect: Allow
+      Sid: AddPerm
+      Action:
+        - s3:GetObject
+      Resource:
+        - arn:aws:s3:::${self:provider.environment.BUCKET}/*
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:*"
+
+functions:
+  create-parking-report:
+    handler: src/reports/create.create
+    events:
+      - http:
+          path: reports
+          method: post
+          cors: true
+  get-parking-reports:
+    handler: src/reports/list.list
+    events:
+      - http:
+          path: reports
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    UrbanParkingS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BUCKET}
+        AccessControl: PublicRead
+    UrbanParkingDBTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.TABLE}

@@ -1,0 +1,29 @@
+{
+  "editor.trimAutoWhitespace": true,
+  "eslint.packageManager": "yarn",
+  "eslint.provideLintTask": true,
+  "eslint.autoFixOnSave": true,
+  "javascript.validate.enable": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[json]": {
+    "editor.formatOnSave": false,
+  },
+  "[html]": {
+    "editor.formatOnSave": false,
+  },
+  "[.md]": {
+    "editor.formatOnSave": false,
+  },
+  "path-intellisense.extensionOnImport": true,
+  "path-intellisense.mappings": {
+    "@/": "${workspaceRoot}/src/"
+  }
+}
