@@ -1,5 +1,15 @@
 # Urban parking report service
 
-## Development env setup
+## Development environment setup
 
-*There are no development environment!*
+*There is no development environment! All test made on dev server!*
+
+```bash
+serverless deploy -v --stage dev
+```
+
+## Deploy to prod
+
+```bash
+serverless deploy -v --stage prod
+```
