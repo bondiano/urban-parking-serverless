@@ -13,22 +13,21 @@ const uploadReportImages = async (report, id) => {
     return []
   }
 
-  const encodedImages = report.images
-  const imagesToUpload = encodedImages.map((encodedImage, index) => ({
-    Body: Buffer.from(
-      encodedImage.replace(/^data:image\/\w+;base64,/, ''),
-      'base64',
-    ),
-    Key: `${id}-${index}.jpg`,
-    ContentType: 'image/jpeg',
-    ACL: 'public-read',
-    ContentEncoding: 'base64',
-  }))
-
   return Promise.all(
-    imagesToUpload.map(image =>
-      s3.upload(image, { ACL: 'public-read' }).promise(),
-    ),
+    report.images.map((image, index) => {
+      const imageToUpload = {
+        Body: Buffer.from(
+          image.replace(/^data:image\/\w+;base64,/, ''),
+          'base64',
+        ),
+        Key: `${id}-${index}.jpg`,
+        ContentType: 'image/jpeg',
+        ACL: 'public-read',
+        ContentEncoding: 'base64',
+      }
+
+      return s3.upload(imageToUpload, { ACL: 'public-read' }).promise()
+    }),
   )
 }
 
@@ -40,10 +39,14 @@ module.exports.create = async event => {
 
   try {
     const images = await uploadReportImages(report, id)
+    const filteredReport = Object.entries(report).reduce(
+      (acc, [key, value]) => (value ? { ...acc, [key]: value } : acc),
+      {},
+    )
     const postData = {
       TableName: process.env.TABLE,
       Item: {
-        ...report,
+        ...filteredReport,
         id,
         images,
         createdAt: timestamp,
