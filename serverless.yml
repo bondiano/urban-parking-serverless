@@ -1,5 +1,8 @@
 service: urban-parking
 
+plugins:
+  - serverless-aws-documentation
+
 custom:
   myStage: ${opt:stage, self:provider.stage}
   myEnvironment:
@@ -45,6 +48,9 @@ functions:
           path: reports
           method: post
           cors: true
+          request:
+            schema:
+              application/json: ${file(src/reports/create-schema.json)}
   get-parking-reports:
     handler: src/reports/list.list
     events:
