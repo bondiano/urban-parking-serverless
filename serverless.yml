@@ -52,6 +52,13 @@ functions:
           path: reports
           method: get
           cors: true
+  get-report-top-emails:
+    handler: src/reports/top.list
+    events:
+      - http:
+          path: top
+          method: get
+          cors: true
 
 resources:
   Resources:

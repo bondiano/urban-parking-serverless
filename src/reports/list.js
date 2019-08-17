@@ -5,7 +5,7 @@ const tableParams = {
   TableName: process.env.TABLE,
 }
 
-module.exports.list = async event => {
+module.exports.list = async () => {
   try {
     const result = await dynamoDB.scan(tableParams).promise()
 
